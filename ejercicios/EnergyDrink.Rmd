@@ -2,5 +2,166 @@
 title: "Análisis Energy Drink"
 author: "Frank Casanova"
 date: "25/1/2022"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
+
+## Cargamos los datos
+
+Cargamos los datos desde la carpeta donde se encuentra el dataset con la función `read.table()`, mostramos información sobre los datos con la función `str()` y mostramo los primeros 5 datos con la función `head()`.
+
+```{r , comment=NA}
+
+Beb_Energ = read.table("../data/EnergyDrink", header = TRUE)
+str(Beb_Energ)
+
+head(Beb_Energ)
+
+```
+
+Con la función `summary()`mostramos las frecuencias absolutas de cada una de las variables del dataset.
+
+```{r , comment=NA}
+summary(Beb_Energ)
+
+```
+
+
+Podemos crear tablas que nos presenten la informacion en función de sus variables conla función `table()`.
+
+En este caso se muestran informacion en relacion al sexo y la carrera de estudio.
+
+```{r , comment = NA}
+table(Beb_Energ$estudio, Beb_Energ$sexo)
+
+```
+Acá se muestra informacion acerca de la acrrea de estudio, el sexo y como tercer parámetro si la persona bebe o no.
+
+```{r , comment = NA}
+table(Beb_Energ$estudio, Beb_Energ$sexo, Beb_Energ$bebe)
+```
+ 
+ Probando `barplot()`
+ 
+```{r , comment = NA}
+barplot(table(Beb_Energ$sexo, Beb_Energ$estudio),
+        col=c('lightblue', 'pink'),
+        main="Estudiantes de cada\n carrera según sexo",
+        legend.text=TRUE )
+
+barplot(table(Beb_Energ$bebe, Beb_Energ$estudio),
+        col=c("#eb8060", "#d9b1f0"),
+        main="Estudiantes de cada\n carrera que beben",
+        legend.text=TRUE )
+
+barplot(table(Beb_Energ$bebe, Beb_Energ$estudio),
+        col=c("#b9e38d", "#a1e9f0"),
+        main="Estudiantes de cada\n carrera que beben",
+        legend.text=TRUE, beside=T )
+```
+ 
+ 
+----------------------------------------------------------------------------
+ 
+# Análisis siguiendo el ejemplo de Joanby
+ 
+### Ejemplo final
+ 
+#### Juntar color de ojos y pelo sin distinguir por sexo
+
+```{r , comment = NA}
+ftable(HairEyeColor)
+male = HairEyeColor[, , "Male"]
+female = HairEyeColor[, , "Female"]
+datos = as.table(male+female)
+datos
+```
+ 
+### Manipulacion de datos
+
+```{r , comment = NA}
+dimnames(datos) = list(
+  Pelo = c("Negro", "Marron", "Pelirrojo", "Rubio"),
+  Ojos = c("Marrones", "Azules", "Pardos", "Verdes"))
+
+datos
+```
+
+### Representacion gráfica
+
+```{r , comment = NA}
+mosaicplot(datos, col = "lightblue", main = "Diagrama de mosaico")
+```
+
+### Datos numéricos
+
+Pasamos a calcular el numero total de individulos
+
+```{r , comment = NA}
+sum(datos)
+colSums(datos)
+rowSums(datos)
+round(prop.table(colSums(datos)),3)
+round(prop.table(rowSums(datos)),3)
+
+```
+
+### Representacion gráfica
+
+```{r , comment = NA}
+barplot(prop.table(colSums(datos)),
+        col = c("#804a1c", "#3343b8", "#e08026", "#31a34c"),
+        main = "Frecuencias relativas\n de colores de ojos",
+        ylim = c(0,0.4))
+barplot(prop.table(rowSums(datos)),
+        col = c("#000000", "#693a0f", "#c24c29", "#c4c278"),
+        main = "Frecuencias relativas\n de colores de cabello",
+        ylim = c(0,0.5))
+
+```
+
+### Freuencias relativas globales y marginales
+
+```{r , comment = NA}
+round(prop.table(datos), 3)
+round(prop.table(datos, margin = 1),3)
+round(prop.table(datos, margin = 2),3)
+```
+
+Calculando todas las frecuencias con la funcion `crosstable()`.
+
+```{r , comment = NA}
+library(gmodels)
+CrossTable(datos)
+```
+
+### Representacion gráfica de frecuencias relativas
+
+```{r , comment = NA}
+barplot(prop.table(datos, margin = 1),
+        main="Frecuencias relativas de colores\n de cabello en cada color de ojos",
+        legend.text = T,
+        beside = T,
+        col = c("black", "lightsalmon4", "red3", "gold"),
+        ylim = c(0,0.8))
+
+barplot(prop.table(datos, margin = 2),
+        main="Frecuencias relativas de colores\n de ojo en cada color de cabellos",
+        legend.text = c("Marrones", "Azules", "Pardos", "Verdes"),
+        beside = T,
+        col = c("brown", "lightblue", "orange3", "greenyellow"),
+        ylim = c(0,0.6))
+```
+
+Otra posibles solucion apra la elaboracion del segundo gráfico de frecuencias relativas y así evitar digitar la leyenda, podemos hallar la transpuesta `t()` de la `prop.table()`.
+
+```{r , comment = NA}
+barplot(t(prop.table(datos, margin = 2)),
+        main="Frecuencias relativas de colores\n de ojo en cada color de cabellos",
+        legend.text = T,
+        beside = T,
+        col = c("brown", "lightblue", "orange3", "greenyellow"),
+        ylim = c(0,0.6))
+```
+

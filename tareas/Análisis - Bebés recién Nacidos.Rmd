@@ -1,0 +1,145 @@
+---
+title: "Análisis - Bebés recién nacidos"
+author: "Frank Casanova"
+date: "27/1/2022"
+output: html_document
+---
+
+# Análisis estadístico descriptivo sobre bebés recién nacidos
+
+En ésta oportunidad de analizará la tabla `birthwt` ubicada dentro de el paquete `MASS` en `R`, que contiene datos que represemtam factores que pueden incidir en e peso de los niños al nacer.
+
+## Instalación de `MASS` y carga de datos
+
+A continuación se muestra la carga de los datos, es importante destacar que si el paquete no se encuentra instalado en tu ambiente de trabalo, lo puedes instalar con el siguiente commando `install.packages("MASS")` y activar la librería con `library("MASS")`. 
+
+```{r Carga_datos, comment=NA}
+library("MASS")
+datos=birthwt
+```
+
+Descripción general de los datos
+
+```{r}
+str(datos)
+head(datos, 5)
+```
+
+## Influencia del raza de la madre en el peso del bebé
+
+```{r}
+peso_raza=table(datos[c("race","low")])
+dimnames(peso_raza)=list(
+  raza = c("Blanca", "Negra", "Otra"),
+  peso = c("Mas de 2.5 kg", "Menos de 2.5 kg")
+)
+peso_raza # Frecuencias aboslutas
+round(prop.table(peso_raza), 3)  # Frec. relativas globales
+round(prop.table(peso_raza, margin = 1), 3) # Frec. relativas según raza
+mosaicplot((prop.table(peso_raza, margin = 1)),
+           main="Influencia de la raza de la madre en el peso del bebé",
+           col=c("pink", "skyblue"))
+
+```
+
+```{r}
+barplot(t(prop.table(peso_raza, margin = 1)),
+        main = "Frecuencias relativas de peso del bebé\n segun la raza de la madre",
+        col=c("deepskyblue", "plum1"),
+        legend.text = T,
+        beside = T,
+        ylim=c(0, 1))
+
+```
+
+En conclusión la raza de la madre si influye en el peso del bebé, ya que, cuando la raza de la madres es blanca, es mas probables que el bebé pese mas de 2.5 kg y si al contrario la raza de la madre es negra, es mas probable que el bebé pese menos de 2.5 kg.
+
+## Influencia de si fuma o no fuma la madre en el peso del bebé
+
+```{r}
+peso_fuma = table(datos[c("low", "smoke")])
+dimnames(peso_fuma)=list(
+  peso = c("Más de 2.5 kg", "Menos de 2.5 kg"),
+  fuma = c("No fuma", "Si fuma")
+)
+
+peso_fuma # Frecuencias absolutas
+prop.table(peso_fuma) # Frec. relativas globales
+prop.table(peso_fuma, margin = 2) # Frec. relativas según si fuma o no fuma
+mosaicplot(peso_fuma,
+           main = "Influencia de si la madre fuma o no fuma en el peso de bebé",
+           col = c("lightblue", "pink"))
+```
+
+
+```{r}
+barplot(prop.table(peso_fuma, margin = 2),
+        main = "Influencia de si la madre fuma o no fuma, en el peso del bebé",
+        col = c("deepskyblue", "plum1"),
+        legend.text = T,
+        beside = T,
+        ylim = c(0,1))
+```
+
+Cuando la madre fuma durante el embaraso, aumenta las probabilidades de que el bebé recién nacido pese menos de 2.5 kg, por otro lado si la madre no fuma durantre el embaraso, aumentan las probabilidades de que su bebé recién nacido pese más de 2.5 kg.
+
+## Influencia de si la madres es hipertensa o no, en el peso del bebé
+
+```{r}
+peso_hipert=table(datos[c("ht", "low")])
+dimnames(peso_hipert)=list(
+  hipertension = c("No", "Si"),
+  peso = c("Más de 2.5 kg", "Menos de 2.5 kg")
+)
+peso_hipert # Frecuencias aboslutas
+round(prop.table(peso_hipert), 3)  # Frec. relativas globales
+round(prop.table(peso_hipert, margin = 1), 3) # Frec. relativas según si es hipertensa o no
+mosaicplot((prop.table(peso_hipert, margin = 1)),
+           main="Influencia de la hipertensión de la madre en el peso del bebé",
+           col=c("pink", "skyblue"))
+```
+
+```{r}
+barplot(t(prop.table(peso_hipert, margin = 1)),
+        main = "Influencia de si la madre es hipertensa o no, en el peso del bebé",
+        col = c("deepskyblue", "plum1"),
+        legend.text = T,
+        beside = T,
+        ylim = c(0,1))
+```
+
+Como se puede notar en las gráficas, cuando la madre no tiene precedentes de hipertensión, el bebé recién nacido tiene más posibilidades de pesar más de 2.5 kg, por el contrario si la madre si presentó precedentes de hipertensión, el bebé tienes mas posibilidades de pesar menos de 2.5 kg.
+
+## Influencia de la raza de la madre, condicion de madre fumadora o no sobre el peso del bebé
+
+```{r}
+peso_raza_fuma = table(datos[c("race", "low", "smoke")])
+dimnames(peso_raza_fuma)=list(
+  raza = c("Blanca", "Negra", "Otra"),
+  peso = c("Mas de 2.5 kg", "Menos de 2.5 kg"),
+  fuma = c("No fuma", "Si fuma")
+)
+round(prop.table(peso_raza_fuma),3) # Freccuencias realativas globales
+round(prop.table(peso_raza_fuma, margin = c(1,3)),3) # Frec. relativas segun raza y condición fumadora
+mosaicplot(prop.table(peso_raza_fuma, margin = c(1,3)),
+          col=c("tan1", "yellowgreen"),
+          main="Influencia de madre fumadora o no y la raza\n en el peso del bebé")
+
+```
+
+En el gráfico podemos notar que indistintamente de la raza, hay cierta tendencia en que si la madre es fumadora, el bebé recien nacido tiende a pesar menos de 2.5 kg, y por el contrario si la madres es no fumadora, indiferentemente si de la raza, el bebé pesa mas de 2.5 kilogramos. 
+
+También cabe destacar que hay más bebés que pesan más de 2.5 kg de madres de raza blanca que bebés que pesan menos de 2.5 kg de madres de raza negra.
+
+Con respecto a los datos de madres de otras razas, muestra a un sector mas promedio con respecto a la cantiad de bebés con pesos mayores o menores a 2.5 kg y la tendencia con respecto a menor peso del bebé y madre fumadora se mantiene.
+
+
+
+
+
+
+
+
+
+
+
